@@ -12,7 +12,7 @@
 
 AI agents can now provision, manage, and debug virtual development environments with full observability.
 
-[Features](#-features) • [Quick Start](#-quick-start) • [Tools](#-all-38-tools) • [Workflows](#-architectural-workflows) • [Examples](#-example-prompts) • [Configuration](#%EF%B8%8F-mcp-configuration)
+[Features](#-features) • [Quick Start](#-quick-start) • [Tools](#-all-mcp-tools) • [Workflows](#-architectural-workflows) • [Examples](#-example-prompts) • [Configuration](#%EF%B8%8F-mcp-configuration)
 
 </div>
 
@@ -20,7 +20,7 @@ AI agents can now provision, manage, and debug virtual development environments 
 
 ## ✨ Features
 
-- **38 MCP Tools** for complete VM lifecycle management
+- **MCP Tools** for complete VM lifecycle management
 - **Real-time Observability** with logs, dashboards, and progress tracking
 - **Snapshot Management** for safe rollback and recovery
 - **Process Control** with kill/list capabilities
@@ -36,7 +36,7 @@ AI agents can now provision, manage, and debug virtual development environments 
 ```
 Virtualbox-mcp-server/          # Turborepo Monorepo
 ├── apps/
-│   └── mcp-server/             # Main MCP server (38 tools)
+│   └── mcp-server/             # Main MCP server (MCP tools)
 │       └── src/
 │           ├── index.ts        # Tool definitions & handlers
 │           ├── error-handler.ts
@@ -93,7 +93,7 @@ node apps/mcp-server/dist/index.js
 
 ---
 
-## 🛠️ All 38 Tools
+## All MCP Tools
 
 ### VM Lifecycle (6 tools)
 
@@ -857,3 +857,6 @@ Example (`resolve_guest_path`):
 - `path_normalization_applied`
 - `warnings`
 - `debug_trace` (only when `MCP_EXEC_DEBUG=1`)
+
+
+
