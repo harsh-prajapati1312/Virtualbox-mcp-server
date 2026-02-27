@@ -78,6 +78,186 @@ export const TOOLS = [
         },
     },
     {
+        name: "exec_guest_command",
+        description: "Execute a guest program (compat mode). Routes to v2 execution engine unless MCP_STRICT_EXEC_V2=0.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                vm_name: { type: "string" },
+                username: { type: "string" },
+                password: { type: "string" },
+                program: { type: "string" },
+                args: { type: "array", items: { type: "string" } },
+                working_dir: { type: "string" },
+                env: { type: "object", additionalProperties: { type: "string" } },
+                timeout_ms: { type: "number" },
+                run_as_admin: { type: "boolean" },
+                capture_output: { type: "boolean" },
+                strict_paths: { type: "boolean" },
+                allow_workdir_fallback: { type: "boolean" },
+                shell_mode: { type: "string", enum: ["windows", "linux", "none", "auto"] }
+            },
+            required: ["vm_name"]
+        }
+    },
+    {
+        name: "exec_guest_command_v2",
+        description: "Strict, deterministic guest execution for forensic workflows with explicit path/workdir semantics.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                vm_name: { type: "string" },
+                username: { type: "string" },
+                password: { type: "string" },
+                program: { type: "string" },
+                args: { type: "array", items: { type: "string" } },
+                working_dir: { type: "string" },
+                env: { type: "object", additionalProperties: { type: "string" } },
+                timeout_ms: { type: "number" },
+                run_as_admin: { type: "boolean" },
+                capture_output: { type: "boolean" },
+                strict_paths: { type: "boolean", default: true },
+                allow_workdir_fallback: { type: "boolean", default: false },
+                shell_mode: { type: "string", enum: ["windows", "linux", "none", "auto"] }
+            },
+            required: ["vm_name"]
+        }
+    },
+    {
+        name: "resolve_guest_path",
+        description: "Resolve and validate a guest path with normalized output before execution.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                vm_name: { type: "string" },
+                path: { type: "string" },
+                username: { type: "string" },
+                password: { type: "string" }
+            },
+            required: ["vm_name", "path"]
+        }
+    },
+    {
+        name: "test_guest_auth",
+        description: "Diagnose guest authentication and guest control readiness with strict error codes.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                vm_name: { type: "string" },
+                username: { type: "string" },
+                password: { type: "string" },
+                timeout_ms: { type: "number" }
+            },
+            required: ["vm_name", "username", "password"]
+        }
+    },
+    {
+        name: "ensure_vm_running",
+        description: "Non-destructive start/resume API that ensures VM reaches running state.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                vm_name: { type: "string" },
+                display_mode: { type: "string", enum: ["headless", "gui", "unchanged"] },
+                timeout_ms: { type: "number" }
+            },
+            required: ["vm_name"]
+        }
+    },
+    {
+        name: "guest_file_exists",
+        description: "Checks whether a file path exists inside the guest.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                vm_name: { type: "string" },
+                username: { type: "string" },
+                password: { type: "string" },
+                path: { type: "string" }
+            },
+            required: ["vm_name", "path", "username", "password"]
+        }
+    },
+    {
+        name: "guest_list_dir",
+        description: "Lists directory entries from the guest path.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                vm_name: { type: "string" },
+                username: { type: "string" },
+                password: { type: "string" },
+                path: { type: "string" }
+            },
+            required: ["vm_name", "path", "username", "password"]
+        }
+    },
+    {
+        name: "guest_read_file",
+        description: "Reads a text file from guest and returns content.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                vm_name: { type: "string" },
+                username: { type: "string" },
+                password: { type: "string" },
+                path: { type: "string" }
+            },
+            required: ["vm_name", "path", "username", "password"]
+        }
+    },
+    {
+        name: "guest_write_file",
+        description: "Writes text content to a guest file path.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                vm_name: { type: "string" },
+                username: { type: "string" },
+                password: { type: "string" },
+                path: { type: "string" },
+                content: { type: "string" }
+            },
+            required: ["vm_name", "path", "content", "username", "password"]
+        }
+    },
+    {
+        name: "guest_hash_file",
+        description: "Computes SHA-256 hash of a guest file.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                vm_name: { type: "string" },
+                username: { type: "string" },
+                password: { type: "string" },
+                path: { type: "string" }
+            },
+            required: ["vm_name", "path", "username", "password"]
+        }
+    },
+    {
+        name: "get_vm_network_info",
+        description: "Returns guest IPs, adapters, and forwarded ports for a VM.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                vm_name: { type: "string" }
+            },
+            required: ["vm_name"]
+        }
+    },
+    {
+        name: "get_guest_tools_health",
+        description: "Returns guest additions and guest control readiness health.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                vm_name: { type: "string" }
+            },
+            required: ["vm_name"]
+        }
+    },
+    {
         name: "upload_file",
         description: "Upload a file from host to VM",
         inputSchema: {
@@ -500,21 +680,31 @@ export const TOOLS = [
     },
     {
         name: "sequentialthinking",
-        description: "A detailed tool for dynamic and reflective problem-solving. MUST be used between steps to analyze state. Features: Checks resources (RAM/Disk) before VM creation, verifies hypothesis, allows branching/backtracking. \n\nParameters:\n- thought: The current thinking step. MUST include technical checks (e.g., 'Checking if host has 4GB RAM free before starting VM').\n- next_thought_needed: True if planning is incomplete.\n- thought_number: Sequence ID.\n- total_thoughts: Est. remaining steps.\n- is_revision: Boolean.\n- revises_thought: ID of thought being fixed.\n- branch_from_thought: ID of branch point.\n- branch_id: Branch identifier.\n- needs_more_thoughts: If scope expands.",
+        description: "A detailed tool for dynamic and reflective problem-solving. MUST be used between steps to analyze state. Features: checks resources before VM actions, verifies hypotheses, allows branching/backtracking. Accepts both camelCase and snake_case keys.",
         inputSchema: {
             type: "object",
             properties: {
                 thought: { type: "string", description: "Analytical content, resource checks, and hypothesis." },
+                thoughtNumber: { type: "number" },
+                totalThoughts: { type: "number" },
+                nextThoughtNeeded: { type: "boolean" },
+                isRevision: { type: "boolean" },
+                revisesThought: { type: "number" },
+                branchFromThought: { type: "number" },
+                branchId: { type: "string" },
+                needsMoreThoughts: { type: "boolean" },
+
+                // Backward-compatible aliases
                 next_thought_needed: { type: "boolean" },
                 thought_number: { type: "number" },
-                totalThoughts: { type: "number" },
+                total_thoughts: { type: "number" },
                 is_revision: { type: "boolean" },
                 revises_thought: { type: "number" },
                 branch_from_thought: { type: "number" },
                 branch_id: { type: "string" },
                 needs_more_thoughts: { type: "boolean" }
             },
-            required: ["thought", "next_thought_needed", "thought_number", "totalThoughts"]
+            required: ["thought"]
         }
     },
 

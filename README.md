@@ -809,3 +809,51 @@ MIT © [usemanusai](https://github.com/usemanusai)
 [⬆ Back to Top](#%EF%B8%8F-virtualbox-mcp-server)
 
 </div>
+
+---
+
+## Windows Path-Safe Execution (v2)
+
+For deterministic Windows guest execution, use `exec_guest_command_v2` and preflight paths with `resolve_guest_path`.
+
+Example (`exec_guest_command_v2`):
+
+```json
+{
+  "name": "exec_guest_command_v2",
+  "arguments": {
+    "vm_name": "Windows Server",
+    "username": "Administrator",
+    "password": "****",
+    "program": "cmd.exe",
+    "args": ["/c", "dir \"G:\\\\New folder\""],
+    "working_dir": "G:\\\\New folder\\\\AD-Forencics",
+    "strict_paths": true,
+    "allow_workdir_fallback": false,
+    "shell_mode": "windows"
+  }
+}
+```
+
+Example (`resolve_guest_path`):
+
+```json
+{
+  "name": "resolve_guest_path",
+  "arguments": {
+    "vm_name": "Windows Server",
+    "path": "\\\\VBoxSvr\\\\shared\\\\New folder",
+    "username": "Administrator",
+    "password": "****"
+  }
+}
+```
+
+`exec_guest_command_v2` response fields:
+- `effective_working_dir`
+- `resolved_program`
+- `resolved_args`
+- `shell_strategy`
+- `path_normalization_applied`
+- `warnings`
+- `debug_trace` (only when `MCP_EXEC_DEBUG=1`)
